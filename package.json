@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "MERN backend server",
   "main": "server.js",
+  "type":"module",
   
   "dependencies": {
     "dotenv": "^8.2.0",
