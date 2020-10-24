@@ -2,7 +2,7 @@ import express from 'express';
 import dotenv from 'dotenv';
 import colors from 'colors';
 
-import products from './data/products.js';
+import productRoutes from './routes/productRoutes.js'
 import connectDB from './config/db.js'
 
 const app = express();
@@ -11,18 +11,12 @@ connectDB();
 
 app.get('/', (req, res) => {
     res.send('API is running...');
-    console.log(products)
 });
 
-app.get('/api/products', (req, res) => {
-    res.json(products);
-});
+app.use('/api/products', productRoutes);
 
-app.get('/api/product/:id', (req, res) => {
-    const product = products.find(p => p._id === req.params.id);
-    res.json(product);
-});
+
 
 const PORT = process.env.PORT;
 
-app.listen(PORT, console.log(`server is runnning in ${process.env.NODE_ENV} mode on port ${PORT}`.magenta.bold));
+app.listen(PORT, console.log(`server is runnning in ${process.env.NODE_ENV} mode on port ${PORT}`.cyan.bold));
