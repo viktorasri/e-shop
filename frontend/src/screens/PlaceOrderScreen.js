@@ -94,7 +94,7 @@ const PlaceOrderScreen = () => {
               <ListGroup.Item>
                 <Row>
                   <Col>Total</Col>
-                  <Col>${addDecimals(cart.totalPrice)}</Col>
+                  <Col>${addDecimals(cart.totalPrice)``}</Col>
                 </Row>
               </ListGroup.Item>
               <ListGroup.Item>
