@@ -13,7 +13,7 @@ const PaymentScreen = ({ history }) => {
   } = cart;
   const dispatch = useDispatch();
 
-  const [paymentMethod, setPaymentMethod] = useState(cart.paymentMethod || 'paypal');
+  const [paymentMethod, setPaymentMethod] = useState(cart.paymentMethod || 'PayPal');
 
   useEffect(() => {
     if (!address || !city || !postalCode || !country) history.push('/shipping');
@@ -30,28 +30,28 @@ const PaymentScreen = ({ history }) => {
 
   return (
     <FormContainer>
-      <CheckoutSteps step1 step2 setp3 />
+      <CheckoutSteps step1 step2 step3 />
       <h1>Payment Method</h1>
       <Form onSubmit={submitHandler}>
         <Form.Group controlId='address'>
           <Form.Label as='legend'>Select Method</Form.Label>
           <Form.Check
             type='radio'
-            value='paypal'
+            value='PayPal'
             label='PayPal or Credit Card'
             id='paypal'
             name='paymentMethod'
-            checked={paymentMethod === 'paypal'}
+            checked={paymentMethod === 'PayPal'}
             onChange={(e) => setPaymentMethod(e.target.value)}
           />
 
           <Form.Check
             type='radio'
-            value='stripe'
+            value='Stripe'
             label='Stripe'
             id='stripe'
             name='paymentMethod'
-            checked={paymentMethod === 'stripe'}
+            checked={paymentMethod === 'Stripe'}
             onChange={(e) => setPaymentMethod(e.target.value)}
           />
         </Form.Group>
