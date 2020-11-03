@@ -17,11 +17,11 @@ const PaymentScreen = ({ history }) => {
 
   useEffect(() => {
     if (!address || !city || !postalCode || !country) history.push('/shipping');
-  }, [cart.shippingAddress]);
+  }, [address, city, postalCode, country, history]);
 
   useEffect(() => {
     dispatch(savePaymentMethod(paymentMethod));
-  }, [paymentMethod]);
+  }, [paymentMethod, dispatch]);
 
   const submitHandler = (e) => {
     e.preventDefault();

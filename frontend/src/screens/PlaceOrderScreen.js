@@ -1,12 +1,23 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { Row, Col, ListGroup, Image, Button, Card } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import Message from '../components/Message';
 import CheckoutSteps from '../components/CheckoutSteps';
+import { createOrder } from '../actions/orderActions';
 
-const PlaceOrderScreen = () => {
+const PlaceOrderScreen = ({ history }) => {
+  const dispatch = useDispatch();
   const cart = useSelector((state) => state.cart);
+
+  const orderCreate = useSelector((state) => state.orderCreate);
+  const { order, success, error } = orderCreate;
+
+  useEffect(() => {
+    if (success) {
+      history.push(`/orders/${order._id}`);
+    }
+  }, [success, order, dispatch, history]);
 
   //  Calculate prices
   cart.itemsPrice = cart.cartItems.reduce((acc, item) => acc + item.qty * item.price, 0);
@@ -14,7 +25,19 @@ const PlaceOrderScreen = () => {
   cart.taxPrice = (cart.itemsPrice + cart.shippingPrice) * 0.21;
   cart.totalPrice = cart.itemsPrice + cart.shippingPrice + cart.taxPrice;
 
-  const handlePlaceOrder = () => {};
+  const handlePlaceOrder = () => {
+    dispatch(
+      createOrder({
+        orderItems: cart.cartItems,
+        shippingAddress: cart.shippingAddress,
+        paymentMethod: cart.paymentMethod,
+        itemsPrice: cart.itemsPrice,
+        shippingPrice: cart.shippingPrice,
+        taxPrice: cart.taxPrice,
+        totalPrice: cart.totalPrice,
+      })
+    );
+  };
 
   const addDecimals = (number) => {
     return (Math.round(number * 100) / 100).toFixed(2);
@@ -94,9 +117,14 @@ const PlaceOrderScreen = () => {
               <ListGroup.Item>
                 <Row>
                   <Col>Total</Col>
-                  <Col>${addDecimals(cart.totalPrice)``}</Col>
+                  <Col>${addDecimals(cart.totalPrice)}</Col>
                 </Row>
               </ListGroup.Item>
+              {error ? (
+                <ListGroup.Item>
+                  <Message variant='danger'>{error}</Message>
+                </ListGroup.Item>
+              ) : null}
               <ListGroup.Item>
                 <Button
                   type='button'
