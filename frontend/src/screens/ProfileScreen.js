@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { Row, Col, Form, Button, Table } from 'react-bootstrap';
+import { LinkContainer } from 'react-router-bootstrap';
 
 import Message from '../components/Message';
 import Loader from '../components/Loader';
 import { getUserDetails, updateProfile } from '../actions/userActions';
 import { getMyOrdersList } from '../actions/orderActions';
 import { USER_UPDATE_PROFILE_RESET } from '../constans/userConstants';
-import { LinkContainer } from 'react-router-bootstrap';
 
 const addDecimals = (number) => {
   return (Math.round(number * 100) / 100).toFixed(2);
