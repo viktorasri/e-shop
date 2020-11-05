@@ -1,11 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { Row, Col, Form, Button } from 'react-bootstrap';
+import { Row, Col, Form, Button, Table } from 'react-bootstrap';
 
 import Message from '../components/Message';
 import Loader from '../components/Loader';
 import { getUserDetails, updateProfile } from '../actions/userActions';
+import { getMyOrdersList } from '../actions/orderActions';
 import { USER_UPDATE_PROFILE_RESET } from '../constans/userConstants';
+import { LinkContainer } from 'react-router-bootstrap';
+
+const addDecimals = (number) => {
+  return (Math.round(number * 100) / 100).toFixed(2);
+};
 
 const ProfileScreen = ({ history }) => {
   const [name, setName] = useState('');
@@ -25,6 +31,9 @@ const ProfileScreen = ({ history }) => {
   const userUpdateProfile = useSelector((state) => state.userUpdateProfile);
   const { success } = userUpdateProfile;
 
+  const orderMyOrdersList = useSelector((state) => state.orderMyOrdersList);
+  const { loading: loadingMyOrders, orders, error: errorMyOrders } = orderMyOrdersList;
+
   useEffect(() => {
     if (!userInfo) {
       history.push('/login');
@@ -38,6 +47,10 @@ const ProfileScreen = ({ history }) => {
       }
     }
   }, [history, userInfo, user, dispatch, success]);
+
+  useEffect(() => {
+    dispatch(getMyOrdersList());
+  }, [userInfo, dispatch]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -59,7 +72,7 @@ const ProfileScreen = ({ history }) => {
 
   return (
     <Row>
-      <Col md={4}>
+      <Col md={3}>
         <Form onSubmit={handleSubmit}>
           <h2>User Profile</h2>
           {error && <Message variant='danger'>{error}</Message>}
@@ -108,8 +121,62 @@ const ProfileScreen = ({ history }) => {
           </Button>
         </Form>
       </Col>
-      <Col md={8}>
+      <Col md={9}>
         <h2>My Orders</h2>
+        {loadingMyOrders ? (
+          <Loader />
+        ) : errorMyOrders ? (
+          <Message variant='danger'>{errorMyOrders}</Message>
+        ) : (
+          <Table striped bordered hover responsive className='table-sm'>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>DATE</th>
+                <th>TOTAL</th>
+                <th>PAID</th>
+                <th>DELIVERED</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              {orders.length ? (
+                orders.map((order) => (
+                  <tr key={order._id}>
+                    <td>{order._id}</td>
+                    <td>{order.createdAt.substring(0, 10)}</td>
+                    <td>{addDecimals(order.totalPrice)}</td>
+                    <td>
+                      {order.isPayed ? (
+                        order.payedAt.substring(0, 10)
+                      ) : (
+                        <i className='fas fa-times' style={{ color: 'red' }} />
+                      )}
+                    </td>
+                    <td>
+                      {order.isDelivered ? (
+                        order.deliveredAt.substring(0, 10)
+                      ) : (
+                        <i className='fas fa-times' style={{ color: 'red' }} />
+                      )}
+                    </td>
+                    <td>
+                      <LinkContainer to={`/orders/${order._id}`}>
+                        <Button variant='dark' className='btn-sm'>
+                          Details
+                        </Button>
+                      </LinkContainer>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan={6}>'Your order list is empty!'</td>
+                </tr>
+              )}
+            </tbody>
+          </Table>
+        )}
       </Col>
     </Row>
   );

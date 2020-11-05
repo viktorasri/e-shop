@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { ORDER_MY_ORDERS_LIST_RESET } from '../constans/orderConstants';
 
 import {
   USER_LOGIN_REQUEST,
@@ -50,6 +51,9 @@ export const logout = () => (dispatch) => {
   });
   dispatch({
     type: USER_DETAILS_RESET,
+  });
+  dispatch({
+    type: ORDER_MY_ORDERS_LIST_RESET,
   });
 };
 
