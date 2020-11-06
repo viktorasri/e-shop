@@ -6,7 +6,9 @@ import {
   getProfileData,
   updateProfileData,
   getUsers,
-  removeUser,
+  removeUserById,
+  findUserById,
+  updateUserById,
 } from '../controllers/userController.js';
 
 const router = express.Router();
@@ -14,6 +16,10 @@ const router = express.Router();
 router.route('/').post(registerUser).get(protect, isAdmin, getUsers);
 router.post('/login', authUser);
 router.route('/profile').get(protect, getProfileData).put(protect, updateProfileData);
-router.route('/:id').delete(protect, isAdmin, removeUser);
+router
+  .route('/:id')
+  .get(protect, isAdmin, findUserById)
+  .put(protect, isAdmin, updateUserById)
+  .delete(protect, isAdmin, removeUserById);
 
 export default router;

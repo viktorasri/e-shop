@@ -25,11 +25,13 @@ const UserListScreen = ({ history }) => {
     } else {
       history.push('/login');
     }
-  }, [dispatch, userInfo, successRemove]);
+  }, [dispatch, userInfo, successRemove, history]);
 
   const removeUserHandler = (id) => {
-    setUserID(id);
-    dispatch(removeUser(id));
+    if (window.confirm(`Are you sure you want to remove ${id} user`)) {
+      setUserID(id);
+      dispatch(removeUser(id));
+    }
   };
 
   return (
@@ -67,7 +69,7 @@ const UserListScreen = ({ history }) => {
                 </td>
 
                 <td>
-                  <LinkContainer to={`/users/${user._id}/edit`}>
+                  <LinkContainer to={`/admin/user/${user._id}/edit`}>
                     <Button variant='dark' className='btn-sm'>
                       <i className='fas fa-edit' />
                     </Button>
