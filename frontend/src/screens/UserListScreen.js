@@ -1,20 +1,23 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { Table, Button } from 'react-bootstrap';
+import { Table, Button, Spinner } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
 
 import Loader from '../components/Loader';
 import Message from '../components/Message';
-import { getUsers } from '../actions/userActions';
+import { getUsers, removeUser } from '../actions/userActions';
 
 const UserListScreen = ({ history }) => {
   const dispatch = useDispatch();
-
+  const [userID, setUserID] = useState(null);
   const usersList = useSelector((state) => state.usersList);
   const { loading, error, users } = usersList;
 
   const userLogin = useSelector((state) => state.userLogin);
   const { userInfo } = userLogin;
+
+  const userRemove = useSelector((state) => state.userRemove);
+  const { success: successRemove, loading: loadingDelete } = userRemove;
 
   useEffect(() => {
     if (userInfo && userInfo.isAdmin) {
@@ -22,7 +25,12 @@ const UserListScreen = ({ history }) => {
     } else {
       history.push('/login');
     }
-  }, [dispatch, userInfo]);
+  }, [dispatch, userInfo, successRemove]);
+
+  const removeUserHandler = (id) => {
+    setUserID(id);
+    dispatch(removeUser(id));
+  };
 
   return (
     <>
@@ -38,7 +46,6 @@ const UserListScreen = ({ history }) => {
               <th>ID</th>
               <th>NAME</th>
               <th>EMAIL</th>
-              <th>PAID</th>
               <th>ADMIN</th>
               <th></th>
             </tr>
@@ -65,8 +72,16 @@ const UserListScreen = ({ history }) => {
                       <i className='fas fa-edit' />
                     </Button>
                   </LinkContainer>
-                  <Button variant='danger' className='btn-sm'>
-                    <i className='fas fa-trash' />
+                  <Button
+                    disabled={loadingDelete}
+                    variant='danger'
+                    className='btn-sm'
+                    onClick={() => removeUserHandler(user._id)}>
+                    {loadingDelete && userID === user._id ? (
+                      <Spinner as='span' animation='border' size='sm' role='status' aria-hidden='true' />
+                    ) : (
+                      <i className='fas fa-trash' />
+                    )}
                   </Button>
                 </td>
               </tr>
