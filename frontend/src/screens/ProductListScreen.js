@@ -5,16 +5,17 @@ import { LinkContainer } from 'react-router-bootstrap';
 
 import Loader from '../components/Loader';
 import Message from '../components/Message';
-import { listProducts } from '../actions/productActions';
+import { listProducts, deleteProduct } from '../actions/productActions';
 
 const ProductListScreen = ({ history }) => {
   const dispatch = useDispatch();
 
   const [productID, setProductID] = useState(null);
+  const productDelete = useSelector((state) => state.productDelete);
+  const { loading: loadingDelete, error: errorDelete, success: successDelete } = productDelete;
+
   const productList = useSelector((state) => state.productList);
   const { loading, error, products } = productList;
-
-  const loadingDelete = false;
 
   const userLogin = useSelector((state) => state.userLogin);
   const { userInfo } = userLogin;
@@ -25,12 +26,12 @@ const ProductListScreen = ({ history }) => {
     } else {
       history.push('/login');
     }
-  }, [dispatch, userInfo, history]);
+  }, [dispatch, userInfo, history, successDelete]);
 
   const removeProductHandler = (id) => {
     if (window.confirm(`Are you sure you want to remove ${id} product`)) {
       setProductID(id);
-      //  REMOVE PRODUCT ACTION
+      dispatch(deleteProduct(id));
     }
   };
 
@@ -50,7 +51,7 @@ const ProductListScreen = ({ history }) => {
           </Button>
         </Col>
       </Row>
-
+      {errorDelete && <Message variant='danger'>{errorDelete}</Message>}
       {loading ? (
         <Loader />
       ) : error ? (
