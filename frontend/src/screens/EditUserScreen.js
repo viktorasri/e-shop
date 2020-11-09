@@ -31,7 +31,7 @@ const EditUserScreen = ({ history, match }) => {
       dispatch({ type: USER_UPDATE_RESET });
       history.push('/admin/userslist');
     }
-  }, [successUpdate, history]);
+  }, [successUpdate, history, dispatch]);
 
   useEffect(() => {
     if (userInfo && userInfo.isAdmin) {
