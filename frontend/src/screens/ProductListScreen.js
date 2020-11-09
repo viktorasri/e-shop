@@ -5,7 +5,8 @@ import { LinkContainer } from 'react-router-bootstrap';
 
 import Loader from '../components/Loader';
 import Message from '../components/Message';
-import { listProducts, deleteProduct } from '../actions/productActions';
+import { listProducts, deleteProduct, createProduct } from '../actions/productActions';
+import { PRODUCT_CREATE_RESET } from '../constans/productConstants';
 
 const ProductListScreen = ({ history }) => {
   const dispatch = useDispatch();
@@ -14,6 +15,9 @@ const ProductListScreen = ({ history }) => {
   const productDelete = useSelector((state) => state.productDelete);
   const { loading: loadingDelete, error: errorDelete, success: successDelete } = productDelete;
 
+  const productCreate = useSelector((state) => state.productCreate);
+  const { loading: loadingCreate, error: errorCreate, success: successCreate, product: createdProduct } = productCreate;
+
   const productList = useSelector((state) => state.productList);
   const { loading, error, products } = productList;
 
@@ -21,12 +25,14 @@ const ProductListScreen = ({ history }) => {
   const { userInfo } = userLogin;
 
   useEffect(() => {
-    if (userInfo && userInfo.isAdmin) {
-      dispatch(listProducts());
+    if (!userInfo && !userInfo.isAdmin) history.push('/login');
+    dispatch({ type: PRODUCT_CREATE_RESET });
+    if (successCreate) {
+      history.push(`/admin/product/${createdProduct._id}/edit`);
     } else {
-      history.push('/login');
+      dispatch(listProducts());
     }
-  }, [dispatch, userInfo, history, successDelete]);
+  }, [dispatch, userInfo, history, successDelete, successCreate, createdProduct]);
 
   const removeProductHandler = (id) => {
     if (window.confirm(`Are you sure you want to remove ${id} product`)) {
@@ -35,8 +41,9 @@ const ProductListScreen = ({ history }) => {
     }
   };
 
-  const createProductHandler = (product) => {
+  const createProductHandler = () => {
     //  CREATE PRODUCT ACTION
+    dispatch(createProduct());
   };
 
   return (
@@ -52,6 +59,8 @@ const ProductListScreen = ({ history }) => {
         </Col>
       </Row>
       {errorDelete && <Message variant='danger'>{errorDelete}</Message>}
+      {errorCreate && <Message variant='danger'>{errorCreate}</Message>}
+      {loadingCreate && <Loader />}
       {loading ? (
         <Loader />
       ) : error ? (
