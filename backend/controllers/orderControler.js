@@ -1,5 +1,6 @@
 import asyncHandler from 'express-async-handler';
 import Order from '../models/orderModel.js';
+import User from '../models/userModel.js';
 
 //  @desc   Place an order products
 //  @route  POST /api/orders
@@ -29,13 +30,20 @@ const addOrder = asyncHandler(async (req, res) => {
 
 //  @desc   Get order by id
 //  @route  GET /api/orders/:id
-//  @access Private
+//  @access Private & admin
 const getOrderById = asyncHandler(async (req, res) => {
-  const order = await Order.findById(req.params.id).populate('user', 'name email');
+  const order = await Order.findOne({ _id: req.params.id }).populate('user', 'id name email');
 
   if (order) {
-    res.status(200);
-    res.json(order);
+    // Check if user is authorized to get order details
+    const requestUser = await User.findById(req.user._id);
+    if (requestUser._id.toString() === order.user._id.toString() || requestUser.isAdmin) {
+      res.status(200);
+      res.json(order);
+    } else {
+      res.status(403);
+      throw new Error('You are not authorized to view this order');
+    }
   } else {
     res.status(404);
     throw new Error('Order not found');
@@ -66,6 +74,23 @@ const updateOrderToPayed = asyncHandler(async (req, res) => {
   }
 });
 
+//  @desc   Update order to payed
+//  @route  PUT /api/orders/:id/pay
+//  @access Private
+const updateOrderToDelivered = asyncHandler(async (req, res) => {
+  const order = await Order.findById(req.params.id);
+
+  if (order) {
+    order.isDelivered = true;
+    order.deliveredAt = Date.now();
+    const updatedOrder = await order.save();
+    res.json(updatedOrder);
+  } else {
+    res.status(404);
+    throw new Error('Order not found');
+  }
+});
+
 //  @desc   Get logged user orders list
 //  @route  GET /api/orders/myorders
 //  @access Private
@@ -82,4 +107,4 @@ const getOrders = asyncHandler(async (req, res) => {
   res.json(orders);
 });
 
-export { addOrder, getOrderById, updateOrderToPayed, getMyOrdersList, getOrders };
+export { addOrder, getOrderById, updateOrderToPayed, updateOrderToDelivered, getMyOrdersList, getOrders };
