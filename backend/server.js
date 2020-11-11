@@ -1,6 +1,7 @@
 import express from 'express';
 import dotenv from 'dotenv';
 import colors from 'colors';
+import morgan from 'morgan';
 
 import { notFound, errorHandler } from './middleware/errorMiddleware.js';
 import connectDB from './config/db.js';
@@ -12,6 +13,9 @@ import uploadRoutes from './routes/uploadRoutes.js';
 const app = express();
 dotenv.config();
 
+if (process.env.NODE_ENV === 'development') {
+  app.use(morgan('dev'));
+}
 //  Mongo DB connect handles
 connectDB();
 
