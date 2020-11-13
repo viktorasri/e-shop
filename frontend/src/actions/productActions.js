@@ -15,6 +15,12 @@ import {
   PRODUCT_UPDATE_REQUEST,
   PRODUCT_UPDATE_FAIL,
   PRODUCT_UPDATE_SUCCESS,
+  PRODUCT_REVIEW_REQUEST,
+  PRODUCT_REVIEW_SUCCESS,
+  PRODUCT_REVIEW_FAIL,
+  PRODUCT_REVIEW_CREATE_REQUEST,
+  PRODUCT_REVIEW_CREATE_SUCCESS,
+  PRODUCT_REVIEW_CREATE_FAIL,
 } from '../constans/productConstants';
 
 export const listProducts = () => async (dispatch) => {
@@ -114,6 +120,46 @@ export const updateProduct = (product) => async (dispatch, getState) => {
   } catch (error) {
     dispatch({
       type: PRODUCT_UPDATE_FAIL,
+      payload: error.response && error.response.data.message ? error.response.data.message : error.message,
+    });
+  }
+};
+
+export const getProductReviews = (productID) => async (dispatch) => {
+  try {
+    dispatch({ type: PRODUCT_REVIEW_REQUEST });
+
+    const { data } = await Axios.get(`/api/products/${productID}/reviews`);
+    dispatch({ type: PRODUCT_REVIEW_SUCCESS, payload: data });
+  } catch (error) {
+    dispatch({
+      type: PRODUCT_REVIEW_FAIL,
+      payload: error.response && error.response.data.message ? error.response.data.message : error.message,
+    });
+  }
+};
+
+export const createProductReview = (productID, review) => async (dispatch, getState) => {
+  try {
+    dispatch({ type: PRODUCT_REVIEW_CREATE_REQUEST });
+
+    const {
+      userLogin: { userInfo },
+    } = getState();
+
+    const config = {
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${userInfo.token}`,
+      },
+    };
+
+    const { data } = await Axios.post(`/api/products/${productID}/reviews`, review, config);
+
+    dispatch({ type: PRODUCT_REVIEW_CREATE_SUCCESS, payload: data.message });
+  } catch (error) {
+    dispatch({
+      type: PRODUCT_REVIEW_CREATE_FAIL,
       payload: error.response && error.response.data.message ? error.response.data.message : error.message,
     });
   }

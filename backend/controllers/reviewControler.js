@@ -33,4 +33,12 @@ const createReview = asyncHandler(async (req, res) => {
   res.status(201).json({ message: 'Review added' });
 });
 
-export { createReview };
+//  @desc   Get product reviews
+//  @route  GET /api/products/:id/reviews
+//  @access Public
+const getProductReviews = asyncHandler(async (req, res) => {
+  const reviews = await Review.find({ product: req.params.id }).populate('user', 'id name');
+  res.json(reviews);
+});
+
+export { createReview, getProductReviews };
