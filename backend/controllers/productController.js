@@ -5,8 +5,22 @@ import Product from '../models/productModel.js';
 //  @route  GET /api/products
 //  @access Public
 const getProducts = asyncHandler(async (req, res) => {
-  const products = await Product.find({});
-  res.json(products);
+  const { search } = req.query;
+  const { pagination, limit, skip } = req;
+
+  const query = search
+    ? {
+        name: {
+          $regex: search.replace(/[-[\]{}()*+?.,\\/^$|#\s]/g, '\\$&'),
+          $options: 'i',
+        },
+      }
+    : {};
+
+  const products = await Product.find({ ...query })
+    .limit(limit)
+    .skip(skip);
+  res.json({ products, pagination });
 });
 
 //  @desc   Fetch single product by id

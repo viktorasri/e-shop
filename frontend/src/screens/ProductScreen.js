@@ -17,7 +17,6 @@ const ProductScreen = ({ match }) => {
 
   const dispatch = useDispatch();
   const history = useHistory();
-
   const productDetails = useSelector((state) => state.productDetails);
   const { product, error, loading } = productDetails;
 
@@ -63,9 +62,10 @@ const ProductScreen = ({ match }) => {
 
   return (
     <>
-      <Link to='/'>
-        <Button className='btn btn-light my-3'>Go Back</Button>
-      </Link>
+      <Button onClick={() => history.goBack()} className='btn btn-light my-3'>
+        Go Back
+      </Button>
+
       {loading ? (
         <Loading />
       ) : error ? (

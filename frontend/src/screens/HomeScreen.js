@@ -6,16 +6,17 @@ import { listProducts } from '../actions/productActions';
 import Product from '../components/Product';
 import Loader from '../components/Loader';
 import Message from '../components/Message';
+import Paginate from '../components/Paginate';
 
-const HomeScreen = () => {
+const HomeScreen = ({ match }) => {
   const dispatch = useDispatch();
-
+  const { query, page } = match.params;
   const productList = useSelector((state) => state.productList);
-  const { loading, products, error } = productList;
+  const { loading, products, error, pagination } = productList;
 
   useEffect(() => {
-    dispatch(listProducts());
-  }, [dispatch]);
+    dispatch(listProducts(query, page));
+  }, [dispatch, query, page]);
 
   return (
     <>
@@ -25,15 +26,18 @@ const HomeScreen = () => {
       ) : error ? (
         <Message variant='danger'>{error}</Message>
       ) : (
-        <Row>
-          {products.map((product) => {
-            return (
-              <Col key={product._id} sm={12} md={6} lg={4}>
-                <Product product={product} />
-              </Col>
-            );
-          })}
-        </Row>
+        <>
+          <Row>
+            {products.map((product) => {
+              return (
+                <Col key={product._id} sm={12} md={6} lg={4}>
+                  <Product product={product} />
+                </Col>
+              );
+            })}
+          </Row>
+          {pagination && <Paginate total={pagination.total} page={pagination.page} />}
+        </>
       )}
     </>
   );
